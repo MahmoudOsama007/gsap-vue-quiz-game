@@ -213,22 +213,26 @@ export default {
 </script>
 <style scoped>
 .quiz-wrapper {
-  background: linear-gradient(135deg, #83a4d4, #b6fbff);
+  background: linear-gradient(135deg, #7c45ea, #15dfea);
+  background-image: url("https://images6.alphacoders.com/999/thumb-1920-999048.jpg"); /* Correct syntax */
+  background-size: cover; /* Optional: Cover the entire area */
+  background-position: center; /* Optional: Center the image */
 }
 
 .question-image {
-  max-width: 100%;
-  height: auto;
+  max-width: 800px;
+  height: 400px;
+  background-position: center; /* Optional: Center the image */
 }
 
 .option {
-  background-color: #4a90e2;
+  background-color: #9e4ae2;
   transition: all 0.3s ease-in-out;
   cursor: pointer;
 }
 
 .option:hover {
-  background-color: #357abf;
+  background-color: #8674db;
   transform: scale(1.05);
   box-shadow: 0 0 10px rgba(53, 122, 191, 0.5);
 }
@@ -244,7 +248,7 @@ export default {
 @keyframes pulse {
   0%,
   100% {
-    box-shadow: 0 0 10px rgba(72, 239, 255, 0.7);
+    box-shadow: 0 0 10px rgba(142, 103, 206, 0.7);
   }
   50% {
     box-shadow: 0 0 30px rgba(72, 239, 255, 1);
