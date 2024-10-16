@@ -52,11 +52,11 @@ export default {
       ],
       emojis: [
         {
-          src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5teOLmZvJEdAzz1EQLAehkhfmex80etwYQA&s",
+          src: "https://c4.wallpaperflare.com/wallpaper/511/93/102/fantasy-samurai-banner-warrior-hd-wallpaper-preview.jpg",
           alt: "Heart",
         },
         {
-          src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoNH2jYTyUt6GEGocaDYyGOC0DMtMMAAiNxg&s",
+          src: "https://www.shutterstock.com/image-vector/lady-samurai-red-moon-wallpaper-260nw-2371639329.jpg",
           alt: "Smile",
         },
         // Add more emojis as desired
@@ -87,7 +87,7 @@ export default {
           emoji,
           { scale: 0.8 },
           {
-            rotation: 50,
+            // rotation: 50,
             scale: 1.1,
             duration: 1,
             repeat: -1,
@@ -191,5 +191,12 @@ export default {
 /* Add styles for falling images */
 .falling-image {
   pointer-events: none; /* Prevent interaction with falling images */
+}
+
+/* New styles for emoji circular effect */
+.emoji {
+  width: 100px; /* Set width and height to keep them circular */
+  height: 100px;
+  object-fit: cover; /* Ensure the image covers the circle */
 }
 </style>
