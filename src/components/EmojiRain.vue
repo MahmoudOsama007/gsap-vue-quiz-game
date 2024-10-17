@@ -28,13 +28,16 @@ export default {
     };
   },
   watch: {
-    triggerAnimation(newValue) {
-      if (newValue) {
-        this.createEmojis();
-        this.$nextTick(() => {
-          this.animateEmojis();
-        });
-      }
+    triggerAnimation: {
+      immediate: true,
+      handler(newValue) {
+        if (newValue) {
+          this.createEmojis();
+          this.$nextTick(() => {
+            this.animateEmojis();
+          });
+        }
+      },
     },
   },
   methods: {
@@ -45,7 +48,7 @@ export default {
           id: i,
           style: {
             left: `${Math.random() * 100}%`,
-            top: `-${Math.random() * 100}%`,
+            top: `-${Math.random() * 100 + 100}%`, // Start above the screen
           },
         });
       }
@@ -53,11 +56,11 @@ export default {
     animateEmojis() {
       gsap.to(".falling-emoji", {
         y: "200vh",
-        duration: 3,
+        duration: 4,
         ease: "none",
         repeat: -1,
         stagger: {
-          each: 0.1,
+          each: 0.2,
           from: "random",
         },
       });
