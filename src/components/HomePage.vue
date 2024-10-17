@@ -121,9 +121,18 @@ export default {
       });
     },
     startGame() {
-      console.log("Start Game button clicked!");
-      // Navigate to the QuizGame component
-      this.$router.push("/quiz-game");
+      // Check if we're already on the quiz page
+      if (this.$route.path !== "/quiz-game") {
+        this.$router.push("/quiz-game").catch((err) => {
+          if (err.name !== "NavigationDuplicated") {
+            // only print error if it's not a navigation duplicate
+            console.error(err);
+          }
+        });
+      } else {
+        // If we're already on the quiz page, emit an event to reset the quiz
+        this.$emit("resetQuiz");
+      }
     },
     createCelebrationEffect() {
       const scoreContainer = this.$refs.scoreContainer;
