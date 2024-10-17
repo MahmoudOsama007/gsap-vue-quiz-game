@@ -23,77 +23,110 @@
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-md-8">
-            <div class="quiz-card rounded-4 shadow p-4">
-              <div
-                class="quiz-header d-flex justify-content-between align-items-center mb-4"
-              >
-                <h1 class="quiz-title m-0">
-                  <span class="tele">TELE</span><span class="play">PLAY</span>
-                </h1>
-                <div class="score">
-                  <img
-                    src="../assets/emoji/Group.svg"
-                    alt="Coin"
-                    class="coin-icon me-2"
-                  />
-                  <span>{{ score }}</span>
+            <div class="quiz-card rounded-4 shadow p-4" ref="quizCard">
+              <div v-if="!quizCompleted">
+                <!-- Quiz header -->
+                <div
+                  class="quiz-header d-flex justify-content-between align-items-center mb-4"
+                >
+                  <h1 class="quiz-title m-0">
+                    <span class="tele">TELE</span><span class="play">PLAY</span>
+                  </h1>
+                  <div class="score">
+                    <img
+                      src="../assets/emoji/Group.svg"
+                      alt="Coin"
+                      class="coin-icon me-2"
+                    />
+                    <span>{{ score }}</span>
+                  </div>
+                </div>
+
+                <!-- Question card -->
+                <div
+                  class="question-card bg-white rounded-4 shadow p-4"
+                  v-if="currentQuestion"
+                  :key="currentQuestionIndex"
+                >
+                  <div
+                    class="question-header d-flex justify-content-between mb-3"
+                  >
+                    <span class="question-number text-primary"
+                      >{{ currentQuestionIndex + 1 }}/{{
+                        questions.length
+                      }}</span
+                    >
+                    <span
+                      class="timer"
+                      :class="{ 'text-danger': timeLeft <= 0 }"
+                    >
+                      <img
+                        src="../assets/emoji/Clock.svg"
+                        alt="Clock"
+                        class="clock-icon me-1"
+                      />
+                      {{ formatTime(Math.abs(timeLeft)) }}
+                    </span>
+                  </div>
+
+                  <h2 class="question-text mb-4">
+                    {{ currentQuestion.question }}
+                  </h2>
+
+                  <div class="options-container">
+                    <button
+                      v-for="(option, index) in currentQuestion.options"
+                      :key="index"
+                      class="option-button btn btn-outline-light w-100 text-start mb-3 d-flex align-items-center"
+                      :class="{
+                        'option-a': index === 0,
+                        'option-b': index === 1,
+                        'option-c': index === 2,
+                        'option-d': index === 3,
+                        selected: selectedAnswer === option,
+                      }"
+                      @click="selectAnswer(option)"
+                    >
+                      <span
+                        class="option-letter rounded-circle me-3 d-flex justify-content-center align-items-center mr-3"
+                      >
+                        {{ ["A", "B", "C", "D"][index] }}
+                      </span>
+                      {{ option }}
+                    </button>
+                  </div>
+
+                  <button
+                    class="next-button btn btn-primary w-100 mt-4"
+                    @click="checkAnswer"
+                    :disabled="!selectedAnswer"
+                  >
+                    {{
+                      currentQuestionIndex === questions.length - 1
+                        ? "FINISH"
+                        : "NEXT"
+                    }}
+                  </button>
                 </div>
               </div>
 
-              <div
-                class="question-card bg-white rounded-4 shadow p-4"
-                v-if="currentQuestion"
-                :key="currentQuestionIndex"
-              >
-                <div
-                  class="question-header d-flex justify-content-between mb-3"
-                >
-                  <span class="question-number text-primary"
-                    >{{ currentQuestionIndex + 1 }}/{{ questions.length }}</span
+              <!-- Quiz completion section -->
+              <div v-if="quizCompleted" class="text-center mt-4">
+                <h2 class="mb-3">Quiz Completed!</h2>
+                <div class="score-display p-3 bg-light rounded-3 mb-4">
+                  <h3 class="mb-0">Your Score</h3>
+                  <p
+                    class="display-4 fw-bold text-primary mb-0"
+                    ref="finalScore"
                   >
-                  <span class="timer text-success">
-                    <img
-                      src="../assets/emoji/Clock.svg"
-                      alt="Clock"
-                      class="clock-icon me-1"
-                    />
-                    {{ formatTime(timeLeft) }}
-                  </span>
+                    {{ score }}
+                  </p>
                 </div>
-
-                <h2 class="question-text mb-4">
-                  {{ currentQuestion.question }}
-                </h2>
-
-                <div class="options-container">
-                  <button
-                    v-for="(option, index) in currentQuestion.options"
-                    :key="index"
-                    class="option-button btn btn-outline-light w-100 text-start mb-3 d-flex align-items-center"
-                    :class="{
-                      'option-a': index === 0,
-                      'option-b': index === 1,
-                      'option-c': index === 2,
-                      'option-d': index === 3,
-                      selected: selectedAnswer === option,
-                    }"
-                    @click="selectAnswer(option)"
-                  >
-                    <span
-                      class="option-letter rounded-circle me-3 d-flex justify-content-center align-items-center mr-3"
-                    >
-                      {{ ["A", "B", "C", "D"][index] }}
-                    </span>
-                    {{ option }}
-                  </button>
-                </div>
-
                 <button
-                  class="next-button btn btn-primary w-100 mt-4"
-                  @click="nextQuestion"
-                  :disabled="!selectedAnswer"
+                  class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-sm"
+                  @click="goToHomePage"
                 >
-                  NEXT
+                  <i class="bi bi-arrow-repeat me-2"></i> Try Again
                 </button>
               </div>
             </div>
@@ -117,6 +150,8 @@ export default {
       selectedAnswer: null,
       timeLeft: 30,
       timer: null,
+      overTime: 0,
+      quizCompleted: false,
     };
   },
   computed: {
@@ -128,22 +163,62 @@ export default {
     selectAnswer(answer) {
       this.selectedAnswer = answer;
     },
-    nextQuestion() {
-      if (this.selectedAnswer === this.currentQuestion.answer) {
-        this.score += 100;
+    checkAnswer() {
+      if (
+        this.currentQuestion &&
+        this.selectedAnswer === this.currentQuestion.answer
+      ) {
+        if (this.timeLeft > 0) {
+          this.score += 100;
+        } else {
+          this.score += 50; // Half points for correct answer after time's up
+        }
       }
 
-      const transition = this.getRandomTransition();
-      transition();
+      if (this.currentQuestionIndex === this.questions.length - 1) {
+        this.animateFinalQuestionTransition();
+      } else {
+        this.nextQuestion();
+      }
+    },
+    nextQuestion() {
+      if (this.currentQuestionIndex < this.questions.length - 1) {
+        const transition = this.getRandomTransition();
+        transition();
+      } else {
+        this.completeQuiz();
+      }
+    },
+    showNextQuestion() {
+      this.currentQuestionIndex++;
+      this.selectedAnswer = null;
+      this.resetTimer();
 
-      this.animateEmojis();
+      if (this.currentQuestionIndex >= this.questions.length) {
+        this.completeQuiz();
+      }
+    },
+    completeQuiz() {
+      this.quizCompleted = true;
+      clearInterval(this.timer);
+      this.$emit("quizComplete", this.score);
+      this.$nextTick(() => {
+        this.animateFinalScore();
+      });
     },
     formatTime(seconds) {
-      return `00:${seconds.toString().padStart(2, "0")}`;
+      const isNegative = seconds < 0;
+      const absoluteSeconds = Math.abs(seconds);
+      const minutes = Math.floor(absoluteSeconds / 60);
+      const remainingSeconds = absoluteSeconds % 60;
+      return `${isNegative ? "-" : ""}${minutes
+        .toString()
+        .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
     },
     resetTimer() {
       clearInterval(this.timer);
       this.timeLeft = 30;
+      this.overTime = 0;
       this.startTimer();
     },
     startTimer() {
@@ -151,7 +226,8 @@ export default {
         if (this.timeLeft > 0) {
           this.timeLeft--;
         } else {
-          this.nextQuestion();
+          this.overTime++;
+          this.timeLeft--; // This will make timeLeft go negative
         }
       }, 1000);
     },
@@ -271,14 +347,48 @@ export default {
       });
     },
 
-    showNextQuestion() {
-      this.currentQuestionIndex++;
-      this.selectedAnswer = null;
-      this.resetTimer();
-
-      if (this.currentQuestionIndex >= this.questions.length) {
-        this.$emit("quizComplete", this.score);
-      }
+    goToHomePage() {
+      this.$emit("goToHome");
+    },
+    animateFinalScore() {
+      const finalScoreElement = this.$refs.finalScore;
+      gsap.fromTo(
+        finalScoreElement,
+        { scale: 0, opacity: 0, rotation: -180 },
+        {
+          scale: 1,
+          opacity: 1,
+          rotation: 0,
+          duration: 1.5,
+          ease: "elastic.out(1, 0.3)",
+          onStart: () => {
+            gsap.to(finalScoreElement, {
+              textContent: this.score,
+              duration: 1.5,
+              snap: { textContent: 1 },
+              ease: "power1.inOut",
+            });
+          },
+        }
+      );
+    },
+    animateFinalQuestionTransition() {
+      const quizCard = this.$refs.quizCard;
+      gsap.to(quizCard, {
+        scale: 0.5,
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.in",
+        onComplete: () => {
+          this.completeQuiz();
+          gsap.to(quizCard, {
+            scale: 1,
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        },
+      });
     },
   },
   mounted() {
@@ -322,6 +432,7 @@ export default {
     #fbfcfb
   ); /* Gradient background */
   border-radius: 20px;
+  transform-origin: center center;
 }
 
 .quiz-title {
@@ -429,4 +540,30 @@ export default {
 .quiz-container {
   background: linear-gradient(135deg, #e8f5e9, #fbfcfb);
 }
+
+.timer.text-danger {
+  color: #dc3545 !important;
+}
+
+.score-display {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border: 2px solid #4caf50;
+  overflow: hidden; /* Ensure the animation doesn't overflow */
+}
+
+.btn-primary {
+  background-color: #9c27b0;
+  border-color: #9c27b0;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #7b1fa2;
+  border-color: #7b1fa2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Add this if you want to use Bootstrap Icons */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css");
 </style>

@@ -8,6 +8,7 @@
       @startGame="startGame"
       @quizComplete="finishQuiz"
       @restart="resetGame"
+      @goToHome="resetGame"
     ></router-view>
   </div>
 </template>
@@ -103,9 +104,10 @@ export default {
       this.quizCompleted = true; // Mark quiz as completed
     },
     resetGame() {
-      this.gameStarted = false; // Reset to show welcome page
-      this.quizCompleted = false; // Ensure quiz is not completed
-      this.score = 0; // Reset score
+      this.gameStarted = false;
+      this.quizCompleted = false;
+      this.score = 0;
+      this.$router.push("/"); // Navigate back to the home page
     },
   },
 };
