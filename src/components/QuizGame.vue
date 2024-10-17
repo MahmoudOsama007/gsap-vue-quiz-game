@@ -134,14 +134,19 @@
         </div>
       </div>
     </div>
+    <emoji-rain v-if="quizCompleted && score > 200" />
   </div>
 </template>
 
 <script>
 import { gsap } from "gsap";
+import EmojiRain from "./EmojiRain.vue";
 
 export default {
   name: "QuizGame",
+  components: {
+    EmojiRain,
+  },
   props: ["questions"],
   data() {
     return {
@@ -204,6 +209,11 @@ export default {
       this.$emit("quizComplete", this.score);
       this.$nextTick(() => {
         this.animateFinalScore();
+        if (this.score > 200) {
+          this.$nextTick(() => {
+            this.$refs.emojiRain.animateEmojis();
+          });
+        }
       });
     },
     formatTime(seconds) {
