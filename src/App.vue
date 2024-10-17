@@ -1,29 +1,20 @@
 <template>
   <div id="app">
-    <WelcomePage v-if="!gameStarted" @startGame="startGame" />
-    <QuizGame
-      v-else-if="!quizCompleted"
+    <router-view
+      :gameStarted="gameStarted"
+      :quizCompleted="quizCompleted"
       :questions="questions"
+      :score="score"
+      @startGame="startGame"
       @quizComplete="finishQuiz"
-    />
-
-    <ScorePage v-else :score="score" @restart="resetGame" />
+      @restart="resetGame"
+    ></router-view>
   </div>
 </template>
 
 <script>
-import WelcomePage from "./components/WelcomePage.vue";
-import QuizGame from "./components/QuizGame.vue";
-import ScorePage from "./components/ScorePage.vue";
-// import AnimatedImages from "./components/AnimatedImages.vue";
-
 export default {
-  components: {
-    WelcomePage,
-    QuizGame,
-    ScorePage,
-    // AnimatedImages,
-  },
+  name: "App",
   data() {
     return {
       gameStarted: false,

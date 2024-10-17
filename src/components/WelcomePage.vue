@@ -7,7 +7,7 @@
         <h1
           class="display-4 mb-4 animate__animated animate__bounceInDown animate-title"
         >
-          Welcome to the Quiz Game!
+          Welcome to TELEYPLAY!
         </h1>
 
         <div class="row justify-content-center mb-4 animated-emojis">
@@ -146,7 +146,7 @@ export default {
 /* Emoji hover effect with glowing border */
 .welcome {
   background: linear-gradient(135deg, #7c45ea, #15dfea);
-  background-image: url("https://wallpapercave.com/wp/wp12875104.png"); /* Correct syntax */
+  /* background-image: url("https://wallpapercave.com/wp/wp12875104.png"); Correct syntax */
   background-size: cover; /* Optional: Cover the entire area */
   background-position: center; /* Optional: Center the image */
 }

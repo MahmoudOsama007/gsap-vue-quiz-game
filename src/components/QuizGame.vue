@@ -1,57 +1,104 @@
 <template>
-  <div class="quiz-wrapper">
-    <div class="d-flex justify-content-center align-items-center vh-100">
-      <div class="quiz-container card p-4 text-center" ref="quizContainer">
-        <img
-          :src="currentQuestion.image"
-          alt="Question Image"
-          class="question-image img-fluid mb-4"
-        />
-        <h2 class="question">{{ currentQuestion.question }}</h2>
+  <div class="quiz-wrapper d-flex flex-column min-vh-100">
+    <header class="header">
+      <div class="logo">
+        <span class="logo-text">TELEPLAY</span>
+      </div>
+    </header>
+    <div
+      class="quiz-container flex-grow-1 d-flex align-items-center position-relative"
+    >
+      <img
+        src="@/assets/emoji/Vector Smart Object-5.svg"
+        alt="Heart"
+        class="emoji heart-emoji"
+        ref="heartEmoji"
+      />
+      <img
+        src="@/assets/emoji/yellow-circle.svg"
+        alt="Sun"
+        class="emoji sun-emoji"
+        ref="sunEmoji"
+      />
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="quiz-card rounded-4 shadow p-4">
+              <div
+                class="quiz-header d-flex justify-content-between align-items-center mb-4"
+              >
+                <h1 class="quiz-title m-0">
+                  <span class="tele">TELE</span><span class="play">PLAY</span>
+                </h1>
+                <div class="score">
+                  <img
+                    src="../assets/emoji/Group.svg"
+                    alt="Coin"
+                    class="coin-icon me-2"
+                  />
+                  <span>{{ score }}</span>
+                </div>
+              </div>
 
-        <!-- Progress Bar for Timer -->
-        <div class="progress mb-3">
-          <div
-            class="progress-bar bg-info"
-            role="progressbar"
-            :style="{ width: `${(timeLeft / 30) * 100}%` }"
-            :aria-valuenow="timeLeft"
-            aria-valuemin="0"
-            aria-valuemax="30"
-          >
-            {{ timeLeft }}s
+              <div
+                class="question-card bg-white rounded-4 shadow p-4"
+                v-if="currentQuestion"
+                :key="currentQuestionIndex"
+              >
+                <div
+                  class="question-header d-flex justify-content-between mb-3"
+                >
+                  <span class="question-number text-primary"
+                    >{{ currentQuestionIndex + 1 }}/{{ questions.length }}</span
+                  >
+                  <span class="timer text-success">
+                    <img
+                      src="../assets/emoji/Clock.svg"
+                      alt="Clock"
+                      class="clock-icon me-1"
+                    />
+                    {{ formatTime(timeLeft) }}
+                  </span>
+                </div>
+
+                <h2 class="question-text mb-4">
+                  {{ currentQuestion.question }}
+                </h2>
+
+                <div class="options-container">
+                  <button
+                    v-for="(option, index) in currentQuestion.options"
+                    :key="index"
+                    class="option-button btn btn-outline-light w-100 text-start mb-3 d-flex align-items-center"
+                    :class="{
+                      'option-a': index === 0,
+                      'option-b': index === 1,
+                      'option-c': index === 2,
+                      'option-d': index === 3,
+                      selected: selectedAnswer === option,
+                    }"
+                    @click="selectAnswer(option)"
+                  >
+                    <span
+                      class="option-letter rounded-circle me-3 d-flex justify-content-center align-items-center mr-3"
+                    >
+                      {{ ["A", "B", "C", "D"][index] }}
+                    </span>
+                    {{ option }}
+                  </button>
+                </div>
+
+                <button
+                  class="next-button btn btn-primary w-100 mt-4"
+                  @click="nextQuestion"
+                  :disabled="!selectedAnswer"
+                >
+                  NEXT
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-
-        <ul class="options list-unstyled">
-          <li
-            v-for="(option, index) in currentQuestion.options"
-            :key="index"
-            :class="[
-              'option',
-              'p-2',
-              'my-2',
-              'rounded',
-              'text-white',
-              {
-                'bg-warning': selectedOption === option,
-                'bg-primary': selectedOption !== option,
-              },
-            ]"
-            @click="selectOption(option, index)"
-            :ref="`option-${index}`"
-          >
-            {{ option }}
-          </li>
-        </ul>
-
-        <button
-          class="btn btn-success mt-3 pulse-button"
-          @click="nextQuestion"
-          v-if="selectedOption"
-        >
-          Next
-        </button>
       </div>
     </div>
   </div>
@@ -61,18 +108,15 @@
 import { gsap } from "gsap";
 
 export default {
-  props: {
-    questions: Array,
-  },
+  name: "QuizGame",
+  props: ["questions"],
   data() {
     return {
       currentQuestionIndex: 0,
-      selectedOption: null,
       score: 0,
-      lastEffect: null,
+      selectedAnswer: null,
       timeLeft: 30,
-      scorePerQuestion: 5,
-      timerInterval: null,
+      timer: null,
     };
   },
   computed: {
@@ -81,177 +125,308 @@ export default {
     },
   },
   methods: {
-    startTimer() {
+    selectAnswer(answer) {
+      this.selectedAnswer = answer;
+    },
+    nextQuestion() {
+      if (this.selectedAnswer === this.currentQuestion.answer) {
+        this.score += 100;
+      }
+
+      const transition = this.getRandomTransition();
+      transition();
+
+      this.animateEmojis();
+    },
+    formatTime(seconds) {
+      return `00:${seconds.toString().padStart(2, "0")}`;
+    },
+    resetTimer() {
+      clearInterval(this.timer);
       this.timeLeft = 30;
-      this.scorePerQuestion = 5;
-
-      this.timerInterval = setInterval(() => {
-        this.timeLeft--;
-
-        if (this.timeLeft === 20) this.scorePerQuestion = 4;
-        if (this.timeLeft === 10) this.scorePerQuestion = 3;
-
-        if (this.timeLeft <= 0) {
-          clearInterval(this.timerInterval);
+      this.startTimer();
+    },
+    startTimer() {
+      this.timer = setInterval(() => {
+        if (this.timeLeft > 0) {
+          this.timeLeft--;
+        } else {
           this.nextQuestion();
         }
       }, 1000);
     },
-    selectOption(option, index) {
-      this.selectedOption = option;
-      clearInterval(this.timerInterval);
+    animateEmojis() {
+      const emojis = [this.$refs.heartEmoji, this.$refs.sunEmoji];
 
-      if (option === this.currentQuestion.answer) {
-        this.score += this.scorePerQuestion;
-      } else {
-        this.shakeOption(index);
-      }
-
-      this.scaleAndRotateOption(index);
-    },
-    shakeOption(index) {
-      const optionElement = this.$refs[`option-${index}`];
-      if (optionElement) {
-        gsap.to(optionElement[0], {
-          x: -10,
-          duration: 0.1,
-          repeat: 5,
+      emojis.forEach((emoji) => {
+        gsap.to(emoji, {
+          scale: 1.1,
+          duration: 1,
+          repeat: -1,
           yoyo: true,
           ease: "power1.inOut",
         });
-      }
+      });
     },
-    scaleAndRotateOption(index) {
-      const optionElement = this.$refs[`option-${index}`];
-      if (optionElement) {
-        gsap.to(optionElement[0], {
-          scale: 1.2,
-          rotation: 15,
-          duration: 0.3,
-          onComplete: () => {
-            gsap.to(optionElement[0], {
+    getRandomTransition() {
+      const transitions = [
+        this.spinTransition,
+        this.elasticSlideTransition,
+        this.flipTransition,
+        this.zoomTransition,
+        this.bounceScaleTransition,
+      ];
+      return transitions[Math.floor(Math.random() * transitions.length)];
+    },
+
+    spinTransition() {
+      gsap.to(".question-card", {
+        scale: 0,
+        rotation: 720,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.inOut",
+        onComplete: () => {
+          this.showNextQuestion();
+          gsap.fromTo(
+            ".question-card",
+            { scale: 0, rotation: -720, opacity: 0 },
+            {
               scale: 1,
               rotation: 0,
-              duration: 0.3,
-            });
-          },
-        });
-      }
+              opacity: 1,
+              duration: 0.8,
+              ease: "power2.out",
+            }
+          );
+        },
+      });
     },
-    nextQuestion() {
-      clearInterval(this.timerInterval);
 
-      if (this.currentQuestionIndex < this.questions.length - 1) {
-        this.animateQuestion();
-      } else {
+    elasticSlideTransition() {
+      gsap.to(".question-card", {
+        x: -window.innerWidth,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.in",
+        onComplete: () => {
+          this.showNextQuestion();
+          gsap.fromTo(
+            ".question-card",
+            { x: window.innerWidth, opacity: 0 },
+            { x: 0, opacity: 1, duration: 1.2, ease: "elastic.out(1, 0.5)" }
+          );
+        },
+      });
+    },
+
+    flipTransition() {
+      gsap.to(".question-card", {
+        rotationY: 90,
+        duration: 0.4,
+        ease: "power1.in",
+        onComplete: () => {
+          this.showNextQuestion();
+          gsap.fromTo(
+            ".question-card",
+            { rotationY: -90 },
+            { rotationY: 0, duration: 0.4, ease: "power1.out" }
+          );
+        },
+      });
+    },
+
+    zoomTransition() {
+      gsap.to(".question-card", {
+        scale: 1.5,
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.in",
+        onComplete: () => {
+          this.showNextQuestion();
+          gsap.fromTo(
+            ".question-card",
+            { scale: 0.5, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.6, ease: "power2.out" }
+          );
+        },
+      });
+    },
+
+    bounceScaleTransition() {
+      gsap.to(".question-card", {
+        scale: 0,
+        y: 100,
+        opacity: 0,
+        duration: 0.6,
+        ease: "back.in(1.7)",
+        onComplete: () => {
+          this.showNextQuestion();
+          gsap.fromTo(
+            ".question-card",
+            { scale: 0, y: -100, opacity: 0 },
+            { scale: 1, y: 0, opacity: 1, duration: 0.8, ease: "bounce.out" }
+          );
+        },
+      });
+    },
+
+    showNextQuestion() {
+      this.currentQuestionIndex++;
+      this.selectedAnswer = null;
+      this.resetTimer();
+
+      if (this.currentQuestionIndex >= this.questions.length) {
         this.$emit("quizComplete", this.score);
       }
     },
-    animateQuestion() {
-      const questionElement = this.$refs.quizContainer;
-      const options = questionElement.querySelectorAll(".option");
-
-      const effects = [this.bounceIn, this.rotateOut, this.fadeOut];
-      let randomEffect;
-
-      do {
-        randomEffect = effects[Math.floor(Math.random() * effects.length)];
-      } while (randomEffect === this.lastEffect);
-
-      this.lastEffect = randomEffect;
-      randomEffect.call(this, questionElement, options);
-      this.startTimer();
-    },
-    bounceIn(questionElement, options) {
-      gsap.fromTo(
-        questionElement,
-        { scale: 0, rotation: 0 },
-        {
-          scale: 1,
-          rotation: 0,
-          duration: 0.5,
-          ease: "bounce.out",
-          onComplete: () => this.nextQuestionTransition(options),
-        }
-      );
-    },
-    rotateOut(questionElement, options) {
-      gsap.to(questionElement, {
-        scale: 0,
-        rotation: 360,
-        duration: 0.5,
-        onComplete: () => this.nextQuestionTransition(options),
-      });
-    },
-    fadeOut(questionElement, options) {
-      gsap.to([questionElement, ...options], {
-        opacity: 0,
-        scale: 0.8,
-        rotation: 0,
-        duration: 0.5,
-        onComplete: () => this.nextQuestionTransition(options),
-      });
-    },
-    nextQuestionTransition(options) {
-      this.currentQuestionIndex++;
-      this.selectedOption = null;
-
-      gsap.set([this.$refs.quizContainer, ...options], {
-        scale: 1,
-        opacity: 1,
-        rotation: 0,
-      });
-    },
   },
   mounted() {
+    this.animateEmojis();
     this.startTimer();
   },
   beforeUnmount() {
-    clearInterval(this.timerInterval);
+    clearInterval(this.timer);
   },
 };
 </script>
+
 <style scoped>
 .quiz-wrapper {
-  background: linear-gradient(135deg, #7c45ea, #15dfea);
-  background-image: url("https://images6.alphacoders.com/999/thumb-1920-999048.jpg"); /* Correct syntax */
-  background-size: cover; /* Optional: Cover the entire area */
-  background-position: center; /* Optional: Center the image */
+  background-color: #e8f5e9;
+}
+.header {
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.question-image {
-  max-width: 800px;
-  height: 400px;
-  background-position: center; /* Optional: Center the image */
+.logo {
+  width: 120px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.option {
-  background-color: #9e4ae2;
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
+.logo-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #9c27b0;
 }
 
-.option:hover {
-  background-color: #8674db;
-  transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(53, 122, 191, 0.5);
+.quiz-card {
+  background: linear-gradient(
+    135deg,
+    #e8f5e9,
+    #fbfcfb
+  ); /* Gradient background */
+  border-radius: 20px;
 }
 
-.progress {
-  height: 10px;
+.quiz-title {
+  font-size: 2rem;
+  font-weight: bold;
 }
 
-.pulse-button {
-  animation: pulse 2s infinite;
+.tele {
+  color: #9c27b0;
+}
+.play {
+  color: #4caf50;
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 10px rgba(142, 103, 206, 0.7);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(72, 239, 255, 1);
-  }
+.score {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.coin-icon,
+.clock-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 5px;
+}
+
+.question-card {
+  border-radius: 20px;
+  transform-origin: center center;
+}
+
+.question-text {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.option-button {
+  border-radius: 50px;
+  padding: 15px 20px;
+  font-size: 1.1rem;
+  background-color: white;
+  border: 2px solid #e0e0e0;
+  color: #333;
+}
+
+.option-button:hover {
+  background-color: #f5f5f5;
+}
+
+.option-letter {
+  width: 30px;
+  height: 30px;
+  font-weight: bold;
+  color: white;
+}
+
+.option-a .option-letter {
+  background-color: #9c27b0;
+}
+.option-b .option-letter {
+  background-color: #4caf50;
+}
+.option-c .option-letter {
+  background-color: #ff9800;
+}
+.option-d .option-letter {
+  background-color: #2196f3;
+}
+
+.next-button {
+  border-radius: 50px;
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background-color: #9c27b0;
+  border-color: #9c27b0;
+}
+
+.next-button:hover {
+  background-color: #7b1fa2;
+  border-color: #7b1fa2;
+}
+
+.emoji {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+}
+
+.heart-emoji {
+  bottom: 20px;
+  left: 20px;
+}
+
+.sun-emoji {
+  top: 20px;
+  right: 20px;
+}
+
+.option-button.selected {
+  background-color: #e0e0e0;
+  border-color: #9c27b0;
+}
+
+.quiz-container {
+  background: linear-gradient(135deg, #e8f5e9, #fbfcfb);
 }
 </style>
