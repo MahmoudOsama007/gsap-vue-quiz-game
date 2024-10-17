@@ -124,7 +124,7 @@
                 </div>
                 <button
                   class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-sm"
-                  @click="goToHomePage"
+                  @click="goToHomePageWithAnimation"
                 >
                   <i class="bi bi-arrow-repeat me-2"></i> Try Again
                 </button>
@@ -390,6 +390,17 @@ export default {
         },
       });
     },
+    goToHomePageWithAnimation() {
+      gsap.to(this.$el, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.in",
+        onComplete: () => {
+          this.goToHomePage();
+        },
+      });
+    },
   },
   mounted() {
     this.animateEmojis();
@@ -566,4 +577,88 @@ export default {
 
 /* Add this if you want to use Bootstrap Icons */
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css");
+
+@media (max-width: 414px) {
+  .header {
+    display: none; /* Hide header for phone sizes */
+  }
+
+  .quiz-wrapper {
+    padding-top: 20px; /* Add some top padding to compensate for the hidden header */
+  }
+
+  .quiz-card {
+    padding: 15px;
+  }
+
+  .quiz-title {
+    font-size: 1.5rem;
+  }
+
+  .score {
+    font-size: 1.2rem;
+  }
+
+  .coin-icon,
+  .clock-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .question-card {
+    padding: 15px;
+  }
+
+  .question-text {
+    font-size: 1.2rem;
+  }
+
+  .option-button {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+
+  .option-letter {
+    width: 25px;
+    height: 25px;
+    font-size: 0.8rem;
+  }
+
+  .next-button {
+    padding: 12px 25px;
+    font-size: 1rem;
+  }
+
+  .emoji {
+    width: 60px;
+    height: 60px;
+  }
+
+  .heart-emoji {
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .sun-emoji {
+    top: 10px;
+    right: 10px;
+  }
+
+  .score-display {
+    padding: 10px;
+  }
+
+  .score-display h3 {
+    font-size: 1.2rem;
+  }
+
+  .score-display p {
+    font-size: 2rem;
+  }
+
+  .btn-primary {
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+}
 </style>

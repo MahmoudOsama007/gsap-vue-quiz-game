@@ -39,8 +39,16 @@
           <div class="blue-line-img emoji secondary-emoji">
             <img src="@/assets/emoji/blue-line.svg" alt="Blue Line" />
           </div>
-          <div class="pink-line emoji secondary-emoji"></div>
+          <div class="pink-line emoji secondary-emoji">
+            <img src="@/assets/emoji/pink-line.svg" alt="Pink Line" />
+          </div>
           <div class="orange-rectangle emoji secondary-emoji">
+            <img
+              src="@/assets/emoji/orange-rectangle.svg"
+              alt="Orange Rectangle"
+            />
+          </div>
+          <div class="orange-rectangle2 emoji secondary-emoji">
             <img
               src="@/assets/emoji/orange-rectangle.svg"
               alt="Orange Rectangle"
@@ -59,7 +67,11 @@
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
           minim veniam.
         </p>
-        <button class="start-button" ref="startButton" @click="startGame">
+        <button
+          class="start-button"
+          ref="startButton"
+          @click="startGameWithAnimation"
+        >
           START GAME
         </button>
       </div>
@@ -118,6 +130,17 @@ export default {
         repeat: -1,
         yoyo: true,
         ease: "power1.inOut",
+      });
+    },
+    startGameWithAnimation() {
+      gsap.to(this.$el, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.in",
+        onComplete: () => {
+          this.startGame();
+        },
       });
     },
     startGame() {
@@ -294,24 +317,30 @@ export default {
 }
 
 .pink-line {
-  width: 40px;
+  /* width: 40px;
   height: 40px;
-  border: 3px solid #ff4081;
-  border-radius: 50% 50% 50% 0;
-  bottom: 15%;
-  right: 10%;
-  transform: rotate(-45deg);
+  border: 3px solid #ff4081; */
+  /* border-radius: 50% 50% 50% 0; */
+  width: 100px;
+  height: 100px;
+  bottom: -3%;
+  right: 22%;
+  transform: rotate(5deg);
 }
 
 .orange-rectangle {
   /* width: 25px;
   height: 50px;
   background-color: #ff9800; */
-  top: 5%;
+  bottom: -3%;
+  right: -40%;
+  transform: rotate(44deg);
+}
+.orange-rectangle2 {
+  top: -10%;
   left: -19%;
   transform: rotate(-33deg);
 }
-
 .yellow-circle {
   /* width: 40px;
   height: 40px;
@@ -384,5 +413,148 @@ export default {
 
 .falling-image {
   pointer-events: none;
+}
+
+/* Tablet Styles */
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 40px 20px;
+  }
+
+  .emoji-container {
+    height: 300px;
+    width: 300px;
+  }
+
+  .main-emoji {
+    width: 90px;
+    height: 90px;
+  }
+
+  .secondary-emoji {
+    width: 45px;
+    height: 45px;
+  }
+
+  .circle {
+    width: 225px;
+    height: 225px;
+  }
+
+  .red-circle {
+    width: 150px;
+    height: 150px;
+  }
+
+  .game-title {
+    font-size: 42px;
+  }
+
+  .game-description {
+    font-size: 14px;
+  }
+
+  .start-button {
+    font-size: 20px;
+    padding: 12px 40px;
+  }
+}
+
+/* Phone Styles */
+@media (max-width: 480px) {
+  .content-wrapper {
+    padding: 30px 15px;
+  }
+
+  .emoji-container {
+    height: 200px;
+    width: 200px;
+  }
+
+  .main-emoji {
+    width: 60px;
+    height: 60px;
+  }
+
+  .secondary-emoji {
+    width: 30px;
+    height: 30px;
+  }
+
+  .circle {
+    width: 150px;
+    height: 150px;
+  }
+
+  .red-circle {
+    width: 100px;
+    height: 100px;
+  }
+
+  .game-title {
+    font-size: 32px;
+  }
+
+  .game-description {
+    font-size: 12px;
+  }
+
+  .start-button {
+    font-size: 16px;
+    padding: 10px 30px;
+  }
+
+  .logo-text {
+    font-size: 20px;
+  }
+
+  .blue-line-img,
+  .pink-line,
+  .orange-rectangle,
+  .orange-rectangle2,
+  .yellow-circle {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Adjust positions for smaller screens */
+@media (max-width: 768px) {
+  .angry {
+    top: 10%;
+    left: 10%;
+  }
+  .surprised {
+    top: 10%;
+    right: 10%;
+  }
+  .heart {
+    bottom: 10%;
+    left: 15%;
+  }
+  .sad {
+    bottom: 25%;
+    right: 8%;
+  }
+  .blue-line-img {
+    top: 40%;
+    left: 0;
+  }
+  .pink-line {
+    bottom: 0;
+    right: 15%;
+  }
+  .orange-rectangle {
+    bottom: 0;
+    right: -30%;
+  }
+  .orange-rectangle2 {
+    top: -5%;
+    left: -15%;
+  }
+  .yellow-circle {
+    bottom: 5%;
+    left: -15%;
+  }
 }
 </style>
