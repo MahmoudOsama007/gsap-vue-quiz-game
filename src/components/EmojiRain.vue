@@ -3,7 +3,7 @@
     <img
       v-for="emoji in emojis"
       :key="emoji.id"
-      :src="require('@/assets/emoji/Vector Smart Object-3.svg')"
+      :src="require('@/assets/emoji/Vector Smart Object-1.svg')"
       :style="emoji.style"
       class="falling-emoji"
       alt="Falling Emoji"
