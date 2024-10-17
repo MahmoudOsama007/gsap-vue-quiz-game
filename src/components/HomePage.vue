@@ -235,7 +235,9 @@ export default {
   text-align: center;
   max-width: 1000px;
   position: relative;
-  background-color: #e8f5e9;
+
+  background: linear-gradient(135deg, #a9e7ae, #fbfcfb);
+
   padding: 60px 40px;
   border-radius: 20px;
 }
@@ -360,9 +362,9 @@ export default {
   height: 300px;
   /* background-color: rgba(244, 67, 54, 0.2); */
   border-radius: 50%;
-  top: 95px;
+  top: 90px;
   right: 50px;
-  backdrop-filter: blur(20px); /* Standard */
+  /* backdrop-filter: blur(20px); Standard */
   -webkit-backdrop-filter: blur(20px); /* Safari */
 }
 
@@ -445,7 +447,7 @@ export default {
     width: 225px;
     height: 225px;
   }
-  /* 
+  /*
   .red-circle {
     width: 150px;
     height: 150px;
