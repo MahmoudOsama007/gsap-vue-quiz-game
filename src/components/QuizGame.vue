@@ -40,20 +40,9 @@
                 </div>
               </div>
 
-              <div v-if="quizCompleted" class="text-center">
-                <h2 class="mb-4">Quiz Completed!</h2>
-                <p class="mb-4">Your final score: {{ score }}</p>
-                <button
-                  class="reset-button btn btn-primary w-100 mt-4"
-                  @click="resetQuiz"
-                >
-                  PLAY AGAIN
-                </button>
-              </div>
-
               <div
                 class="question-card bg-white rounded-4 shadow p-4"
-                v-if="currentQuestion && !quizCompleted"
+                v-if="currentQuestion"
                 :key="currentQuestionIndex"
               >
                 <div
@@ -128,7 +117,6 @@ export default {
       selectedAnswer: null,
       timeLeft: 30,
       timer: null,
-      quizCompleted: false,
     };
   },
   computed: {
@@ -141,41 +129,18 @@ export default {
       this.selectedAnswer = answer;
     },
     nextQuestion() {
-      if (this.currentQuestionIndex < this.questions.length - 1) {
-        this.currentQuestionIndex++;
-        this.selectedAnswer = null;
-        this.resetTimer();
-      } else {
-        this.completeQuiz();
+      if (this.selectedAnswer === this.currentQuestion.answer) {
+        this.score += 100;
       }
-    },
 
-    completeQuiz() {
-      this.quizCompleted = true;
-      clearInterval(this.timer);
-      this.$emit("quizComplete", this.score);
-    },
+      const transition = this.getRandomTransition();
+      transition();
 
-    checkAnswer() {
-      if (this.selectedAnswer !== null) {
-        const currentQuestion = this.questions[this.currentQuestionIndex];
-        if (currentQuestion && this.selectedAnswer === currentQuestion.answer) {
-          this.score++;
-        }
-        this.nextQuestion();
-      }
+      this.animateEmojis();
     },
-
-    showNextQuestion() {
-      if (this.currentQuestionIndex < this.questions.length - 1) {
-        this.currentQuestionIndex++;
-        this.selectedAnswer = null;
-        this.resetTimer();
-      } else {
-        this.completeQuiz();
-      }
+    formatTime(seconds) {
+      return `00:${seconds.toString().padStart(2, "0")}`;
     },
-
     resetTimer() {
       clearInterval(this.timer);
       this.timeLeft = 30;
@@ -306,12 +271,14 @@ export default {
       });
     },
 
-    formatTime(seconds) {
-      return `00:${seconds.toString().padStart(2, "0")}`;
-    },
+    showNextQuestion() {
+      this.currentQuestionIndex++;
+      this.selectedAnswer = null;
+      this.resetTimer();
 
-    resetQuiz() {
-      this.$emit("resetQuiz");
+      if (this.currentQuestionIndex >= this.questions.length) {
+        this.$emit("quizComplete", this.score);
+      }
     },
   },
   mounted() {
@@ -461,19 +428,5 @@ export default {
 
 .quiz-container {
   background: linear-gradient(135deg, #e8f5e9, #fbfcfb);
-}
-
-.reset-button {
-  border-radius: 50px;
-  padding: 15px 30px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  background-color: #4caf50;
-  border-color: #4caf50;
-}
-
-.reset-button:hover {
-  background-color: #45a049;
-  border-color: #45a049;
 }
 </style>
