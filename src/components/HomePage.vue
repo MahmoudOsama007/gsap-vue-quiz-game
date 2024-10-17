@@ -57,7 +57,12 @@
           <div class="yellow-circle emoji secondary-emoji">
             <img src="@/assets/emoji/yellow-circle.svg" alt="Yellow Circle" />
           </div>
-          <div class="red-circle"></div>
+          <div class="red-circle">
+            <img
+              src="@/assets/emoji/Vector Smart Object-6.svg"
+              alt="Red Circle"
+            />
+          </div>
         </div>
         <h1 class="game-title">
           <span class="tele">TELE</span><span class="play">PLAY</span>
@@ -351,12 +356,12 @@ export default {
 }
 
 .red-circle {
-  width: 200px;
-  height: 200px;
-  background-color: rgba(244, 67, 54, 0.2);
+  width: 300px;
+  height: 300px;
+  /* background-color: rgba(244, 67, 54, 0.2); */
   border-radius: 50%;
-  top: 100px;
-  right: 100px;
+  top: 95px;
+  right: 50px;
   backdrop-filter: blur(20px); /* Standard */
   -webkit-backdrop-filter: blur(20px); /* Safari */
 }
@@ -440,11 +445,11 @@ export default {
     width: 225px;
     height: 225px;
   }
-
+  /* 
   .red-circle {
     width: 150px;
     height: 150px;
-  }
+  } */
 
   .game-title {
     font-size: 42px;
@@ -486,10 +491,10 @@ export default {
     height: 150px;
   }
 
-  .red-circle {
+  /* .red-circle {
     width: 100px;
     height: 100px;
-  }
+  } */
 
   .game-title {
     font-size: 32px;
