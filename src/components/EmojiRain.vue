@@ -16,19 +16,30 @@ import { gsap } from "gsap";
 
 export default {
   name: "EmojiRain",
+  props: {
+    triggerAnimation: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       emojis: [],
     };
   },
-  mounted() {
-    this.createEmojis();
-    this.$nextTick(() => {
-      this.animateEmojis();
-    });
+  watch: {
+    triggerAnimation(newValue) {
+      if (newValue) {
+        this.createEmojis();
+        this.$nextTick(() => {
+          this.animateEmojis();
+        });
+      }
+    },
   },
   methods: {
     createEmojis() {
+      this.emojis = [];
       for (let i = 0; i < 50; i++) {
         this.emojis.push({
           id: i,

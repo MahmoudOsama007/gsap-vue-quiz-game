@@ -134,7 +134,7 @@
         </div>
       </div>
     </div>
-    <emoji-rain v-if="quizCompleted && score > 200" />
+    <emoji-rain v-if="showEmojiRain" :trigger-animation="showEmojiRain" />
   </div>
 </template>
 
@@ -157,6 +157,7 @@ export default {
       timer: null,
       overTime: 0,
       quizCompleted: false,
+      showEmojiRain: false,
     };
   },
   computed: {
@@ -210,9 +211,7 @@ export default {
       this.$nextTick(() => {
         this.animateFinalScore();
         if (this.score > 200) {
-          this.$nextTick(() => {
-            this.$refs.emojiRain.animateEmojis();
-          });
+          this.showEmojiRain = true;
         }
       });
     },
