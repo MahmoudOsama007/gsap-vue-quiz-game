@@ -122,12 +122,54 @@
                     {{ score }}
                   </p>
                 </div>
+
                 <button
-                  class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-sm"
+                  class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-sm mb-4"
                   @click="goToHomePageWithAnimation"
                 >
                   <i class="bi bi-arrow-repeat me-2"></i> Try Again
                 </button>
+
+                <!-- Answer review section -->
+                <div class="answer-review mt-4">
+                  <h3 class="mb-3">Review Your Answers</h3>
+                  <div
+                    v-for="(answer, index) in userAnswers"
+                    :key="index"
+                    class="answer-item mb-4 p-3 border rounded"
+                  >
+                    <p class="question-text mb-2">
+                      {{ index + 1 }}. {{ answer.question }}
+                    </p>
+                    <div
+                      v-for="(option, optionIndex) in answer.options"
+                      :key="optionIndex"
+                      class="option-review p-2 mb-1 rounded"
+                      :class="{
+                        'bg-danger text-white':
+                          option === answer.userAnswer &&
+                          option !== answer.correctAnswer,
+                        'bg-success text-white':
+                          option === answer.correctAnswer,
+                      }"
+                    >
+                      {{ option }}
+                      <span
+                        v-if="
+                          option === answer.userAnswer &&
+                          option !== answer.correctAnswer
+                        "
+                        class="float-right"
+                        >✗ Your answer</span
+                      >
+                      <span
+                        v-if="option === answer.correctAnswer"
+                        class="float-right"
+                        >✓ Correct answer</span
+                      >
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -158,6 +200,7 @@ export default {
       overTime: 0,
       quizCompleted: false,
       showEmojiRain: false,
+      userAnswers: [],
     };
   },
   computed: {
@@ -170,6 +213,13 @@ export default {
       this.selectedAnswer = answer;
     },
     checkAnswer() {
+      this.userAnswers.push({
+        question: this.currentQuestion.question,
+        options: this.currentQuestion.options,
+        userAnswer: this.selectedAnswer,
+        correctAnswer: this.currentQuestion.answer,
+      });
+
       if (
         this.currentQuestion &&
         this.selectedAnswer === this.currentQuestion.answer
