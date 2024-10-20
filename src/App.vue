@@ -10,18 +10,18 @@
       @restart="resetGame"
       @goToHome="resetGame"
     ></router-view>
-    <mouse-trail></mouse-trail>
+    <!-- <mouse-trail></mouse-trail> -->
   </div>
 </template>
 
 <script>
-import MouseTrail from "./components/MouseTrail.vue";
+// import MouseTrail from "./components/MouseTrail.vue";
 
 export default {
   name: "App",
-  components: {
-    MouseTrail,
-  },
+  // components: {
+  //   MouseTrail,
+  // },
   data() {
     return {
       gameStarted: false,
